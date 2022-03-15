@@ -6,11 +6,10 @@ import streamlit as st
 from utils import spreadManager
 from datetime import datetime
 from annotated_text import annotated_text
-import json
 
 """
 Variables globales:
-- timezone: Huso horario cuyas horas vamos a coger
+- timezone: Huso horario cuyas horas vamos a usar en nuestra hoja
 - knowledgeBases: Lista de bases de conocimiento para nuestra consulta
 - QAService: Url del servicio de Question-Answering
 - dbDirection: Direccion de la base de datos
@@ -18,11 +17,12 @@ Variables globales:
 - spreadsheet_id: Identificador de nuestro Libro de Calculo
 - validationSheet: Nombre de la Hoja a modificar (hoja de validacion)
 """
+
 timezone = pytz.timezone("Europe/Madrid")
 
 knowledgeBases = ["wikidata","dbpedia","cord19"]
-
 QAService = "http://127.0.0.1:5000/muheqa/"
+dbDirection = "mongodb://localhost:27017"
 
 spreadsheet = "MuHeQa_Validation"
 spreadsheetId = "1TY6Tj1OwITOW3o1nYRFFRY1bunvHNImUj-J0omRq4-I"
@@ -77,9 +77,8 @@ def main():
         annotated_text(context[:answerStart],(answerInText,tag,color),context[answerEnd:],)
 
     #Creamos la conexion para la base de datos (datasets) y el Libro de Calculo (validacion)
-    spreadManager = spreadManager.spreadManager()
-    dbManager = dbManager.dbManager()
-
+    spread = spreadManager.SpreadManager(spreadsheet, spreadsheetId, validationSheet)
+    db = dbManager.DbManager(dbDirection)
 
     #Subtitulo de la seccion de pregunta y respuesta
     st.subheader('MuHeQa UI - Question Answering over Multiple and Heterogeneous Knowledge Bases')
@@ -91,7 +90,7 @@ def main():
 
     #Lista de Hojas de Calculo con Datasets en nuestra base de datos
     selectorList = ["All"] 
-    selectorList.extend(dbManager.getCollections(database))
+    selectorList.extend(db.getCollections())
     
     #Buscador para realizar preguntas
     question = st.text_input("")
@@ -105,7 +104,7 @@ def main():
     modelAnswer = None
 
     if randomQuestion:
-        randomDict = dbManager.getRandomDocument(1,database,dataset)[0]
+        randomDict = db.getRandomDocument(1,dataset)[0]
         question = randomDict["question"]
         modelAnswer = randomDict["answer"]
 
@@ -155,7 +154,7 @@ def main():
         #Si se pulsa el boton de correcto/incorrecto:
         if isRight or isWrong:
             #Insertamos en la Spreadsheet de Google
-            spreadDbManager.insertRow(worksheet, [[question, isRight, json.dumps(highestScoreAnswer), str(datetime.now(tz=timezone))]])
+            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz=timezone))]])
             #Reseteamos los valores de los botones
             isRight = False
             isWrong = False

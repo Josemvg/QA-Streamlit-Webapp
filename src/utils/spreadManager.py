@@ -15,7 +15,7 @@ Atributos:
 - creds: Credenciales de la cuenta
 - client: Conexion a la Hoja de Calculo
 """
-class spreadManager:
+class SpreadManager:
 
     def __init__(self,spreadsheet, spreadsheetId, validationSheet):
 
@@ -26,8 +26,8 @@ class spreadManager:
         
         if os.path.exists('credentials.json'):
             self.creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', self.scope)
-            service = build("sheets","v4",credentials=self.creds, cache_discovery=False)
-            self.client = service.spreadsheets()
+            self.service = build("sheets","v4",credentials=self.creds, cache_discovery=False)
+            self.connector = self.service.spreadsheets()
         else:
             print("DB ERROR > Missing Credentials for accessing")
             exit()
@@ -37,12 +37,10 @@ class spreadManager:
         Funcion auxiliar que inserta una nueva fila en la Hoja de Validacion
         """
         values = (
-            self.client.values()
-            .append(
+            self.connector.values().append(
                 spreadsheetId=self.spreadsheetId,
-                range=f"{self.validationSheet}!A:D",
+                range=f"{self.validationSheet}!A:E",
                 body=dict(values=row),
                 valueInputOption="USER_ENTERED",
-            )
-            .execute()
+            ).execute()
         )

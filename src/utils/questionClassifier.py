@@ -9,7 +9,7 @@ import numpy as np
 import csv
 import json
 
-class BertQuestionAnswerClassifier:
+class QuestionClassifier:
     
     def __init__(self,resources_dir):
 

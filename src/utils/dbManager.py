@@ -22,23 +22,22 @@ class DbManager:
         self.userName = userName
         self.userPassword = userPassword
 
-        #Creamos la conexion con la base de datos
         if clusterName:
-            self.client = MongoClient("mongodb+srv://" + userName + ":" + userPassword + "@" + clusterName + "?retryWrites=true&w=majority", tlsCAFile = certifi.where())
+            self.database = MongoClient("mongodb+srv://" + userName + ":" + userPassword + "@" + clusterName + "?retryWrites=true&w=majority", tlsCAFile = certifi.where())
         else:
-            self.client = MongoClient(serverDir)
+            self.database = MongoClient(serverDir).database
 
     def getCollections(self):
         """
         Funcion auxiliar que muestra las colecciones en nuestra base de datos
         """
-        return self.client.list_collection_names()
+        return self.database.list_collection_names()
 
     def importDataset(self, dataset, datasetName):
         """
         Funcion auxiliar que inserta un dataset a la base de datos
         """
-        newCol = self.client[datasetName]
+        newCol = self.database[datasetName]
         if len(dataset) > 1:
             newCol.insert_many(dataset)
         else:
@@ -53,10 +52,23 @@ class DbManager:
             dataset = random.choice(self.getCollections())
 
         documentList = []
-        randomCursor = self.client[dataset].aggregate([{ "$sample": { "size": number } }])
+        randomCursor = self.database[dataset].aggregate([{ "$sample": { "size": number } }])
 
         for document in randomCursor:
             documentList.append(document)
+        return documentList
+
+    def getAllDocuments(self, dataset):
+        """
+        Funcion auxiliar que devuelve todos los documentos de una coleccion
+        como lista de diccionarios
+        """
+        collection = self.database[dataset]
+        
+        documentList = []
+        for document in collection.find():
+            documentList.append(document)
+        
         return documentList
 
     def getDocumentCount(database,dataset):
@@ -70,7 +82,7 @@ class DbManager:
         Funcion auxiliar que muestra las colecciones en nuestra base de datos
         """
         if collectionName in self.getCollections():
-            col = self.client[collectionName]
+            col = self.database[collectionName]
             col.drop()
 
     def clearDatabase(self):
@@ -78,11 +90,11 @@ class DbManager:
         Funcion auxiliar que vacia las colecciones de nuestra base de datos
         """
         for collectionName in self.getCollections():
-            col = self.client[collectionName]
+            col = self.database[collectionName]
             col.drop()
 
     def getStatus(self):
         """
         Funcion auxiliar que devuelve el estado del servidor de la base de datos
         """
-        return self.client("serverStatus")
+        return self.database("serverStatus")
