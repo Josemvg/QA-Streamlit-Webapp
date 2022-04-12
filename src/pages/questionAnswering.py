@@ -22,7 +22,7 @@ timezone = pytz.timezone("Europe/Madrid")
 
 knowledgeBases = ["wikidata","dbpedia","cord19"]
 QAService = "http://127.0.0.1:5000/muheqa/"
-dbDirection = "mongodb://localhost:27017"
+dbDirection = "mongodb:27017"
 
 spreadsheet = "MuHeQa_Validation"
 spreadsheetId = "1TY6Tj1OwITOW3o1nYRFFRY1bunvHNImUj-J0omRq4-I"
