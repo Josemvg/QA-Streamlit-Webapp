@@ -2,7 +2,7 @@ import streamlit as st
 from utils import dbManager
 from utils import parseDatasets
 
-dbDirection = "mongodb://localhost:27017"
+dbDirection = "mongodb:27017"
 
 def main():
 
