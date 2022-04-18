@@ -95,8 +95,7 @@ When using this User Interface for your Extractive Question-Answering Service, y
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Sheets.png"></p>
     5. Go to "Credentials" (sidebar), click "Create Credentials" -> "Service Account Key". Create a new account.
     <p align="center"><img src=https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Create%20Credentials.png></p> 
-    6. From the "Credentials" page, access your newly created account at the "Service Accounts" Section.
-    7. Finally, on "Keys" add a new key from the "Add Keys" button, with Type "JSON".
+    6. From the "Credentials" page, access your newly created account at the "Service Accounts" Section. Finally, on "Keys" add a new key from the "Add Keys" button, with Type "JSON".
 4. A JSON with the following format should have been downloaded onto your PC. Save it on `src/utils/` as `credentials.json`.
 ```
 {
