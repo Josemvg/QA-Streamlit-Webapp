@@ -86,10 +86,16 @@ When using this User Interface for your Extractive Question-Answering Service, y
 3. Next, you will need to create a Service Account and obtain OAuth2 Credentials to access your Spreadsheet from the Google Drive API for Python.
     1. Head over to the [Google API Dashboard](https://console.developers.google.com/).
     2. Create a new project from the Navigation Bar by clicking "My First Project", and then "New Project" on the pop-up window:
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20First%20Project.png"></p>
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20New%20Project.png"></p>
     3. Next, from "Enabled APIs and Services" (Sidebar) click on "+ Enable APIs and Services".
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20APIs.png"></p>
     4. From the search bar, look for "Google Drive API" and "Google Sheets API" and enable them so you can access Sheets uploaded on Google Drive.
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Drive.png"></p>
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Sheets.png"></p>
     5. Go to "Credentials" (sidebar), click "Create Credentials" -> "Service Account Key". Create a new account.
-    6. From the "Credentials" page, access your newly created account from the "Service Accounts" Section.
+    <p align="center"><img src=https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Create%20Credentials.png></p> 
+    6. From the "Credentials" page, access your newly created account at the "Service Accounts" Section.
     7. Finally, on "Keys" add a new key from the "Add Keys" button, with Type "JSON".
 4. A JSON with the following format should have been downloaded onto your PC. Save it on `src/utils/` as `credentials.json`.
 ```
