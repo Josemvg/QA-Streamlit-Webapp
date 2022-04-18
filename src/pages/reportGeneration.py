@@ -2,13 +2,10 @@ import os
 import base64
 import pandas as pd
 import streamlit as st
-from utils import dbManager
 import plotly.graph_objs as go
 from fpdf import FPDF, HTMLMixin
 from utils import questionClassifier
 from tempfile import NamedTemporaryFile
-
-dbDirection = "mongodb:27017"
 
 resourcesDir = os.path.join(os.path.dirname(os.path.realpath("__file__")),"resources_dir")
 
@@ -96,13 +93,11 @@ def generatePDF(pdf, fileName, export = False):
     if export:
         pdf.output(fileName, "F")
 
-def main():
+def app(db):
 
     st.markdown("""
     Select a dataset to generate a quality report on it.
     """, unsafe_allow_html=True)
-
-    db = dbManager.DbManager(dbDirection)
 
     selectorList = [] 
     selectorList.extend(db.getCollections())

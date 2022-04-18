@@ -1,6 +1,5 @@
 import streamlit as st
-
-# Define the multipage class to manage the multiple apps in our program 
+ 
 class MultiPage: 
     """
     Clase que gestiona multiples paginas en una misma aplicacion de streamlit.
@@ -20,7 +19,7 @@ class MultiPage:
         """
         self.pages.update({title: func})
 
-    def run(self):
+    def run(self, db):
         """
         Funcion que ejecuta el codigo de la aplicacion
         """
@@ -30,5 +29,5 @@ class MultiPage:
             self.pages.keys()
         )
 
-        # run the app function 
-        self.pages[page]()
+        #Ejecutar funcion de la pagina seleccionada
+        self.pages[page](db)

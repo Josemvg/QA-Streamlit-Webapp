@@ -31,6 +31,9 @@ pip-delete-this-directory.txt
 nosetests.xml
 coverage.xml
 
+# Environment Variable Files
+*.env
+
 # Translations
 *.mo
 

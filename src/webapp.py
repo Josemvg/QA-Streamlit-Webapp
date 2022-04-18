@@ -1,7 +1,8 @@
 import streamlit as st
-
+import os 
 #Importamos el gestor de multiples paginas
-from utils.multipage import MultiPage 
+from utils.multipage import MultiPage
+from utils import dbManager 
 #Importamos las aplicaciones correspondientes a las distintas paginas de nuestra interfaz
 from pages import questionAnswering, datasetManagement, reportGeneration
 
@@ -25,10 +26,12 @@ st.markdown("""
     It allows users to make questions onto this Service, giving input on its performance, and Upload their own Question-Answering Datasets.
     """, unsafe_allow_html=True)
 
+db = dbManager.DbManager("mongodb:27017")
+
 #Agregamos las distintas paginas
-app.add_page("Question-Answering",questionAnswering.main)
-app.add_page("Upload Dataset",datasetManagement.main)
-app.add_page("Report Generation",reportGeneration.main)
+app.add_page("Question-Answering",questionAnswering.app)
+app.add_page("Upload Dataset",datasetManagement.app)
+app.add_page("Report Generation",reportGeneration.app)
 
 #Ejecutamos el codigo de la pagina principal
-app.run()
+app.run(db)

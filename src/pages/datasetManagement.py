@@ -4,7 +4,7 @@ from utils import parseDatasets
 
 dbDirection = "mongodb:27017"
 
-def main():
+def app(db):
 
     #Subtitulo de la seccion de gestion de conjuntos de datos
     st.subheader('Dataset Management')

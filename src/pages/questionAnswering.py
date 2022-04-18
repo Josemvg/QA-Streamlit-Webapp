@@ -1,14 +1,14 @@
+import os
 import pytz
 import requests
 import operator
-from utils import dbManager
 import streamlit as st
 from utils import spreadManager
 from datetime import datetime
 from annotated_text import annotated_text
 
 """
-Variables globales:
+Variables de entorno:
 - timezone: Huso horario cuyas horas vamos a usar en nuestra hoja
 - knowledgeBases: Lista de bases de conocimiento para nuestra consulta
 - QAService: Url del servicio de Question-Answering
@@ -18,15 +18,16 @@ Variables globales:
 - validationSheet: Nombre de la Hoja a modificar (hoja de validacion)
 """
 
-timezone = pytz.timezone("Europe/Madrid")
+EQA_SERVICE_DIRECTION = os.getenv("EQA_SERVICE_DIRECTION")
+EQA_SERVICE_ROUTINGS = os.getenv("EQA_SERVICE_ROUTINGS","").split(",")
 
-knowledgeBases = ["wikidata","dbpedia","cord19"]
-QAService = "http://127.0.0.1:5000/muheqa/"
-dbDirection = "mongodb:27017"
+SPREAD_TIMEZONE = pytz.timezone(os.getenv("SPREAD_TIMEZONE","Europe/Madrid"))
+WORKSHEET = os.getenv("WORKSHEET")
+WORKSHEET_ID = os.getenv("WORKSHEET_ID")
+SPREADSHEET = os.getenv("SPREADSHEET")
 
-spreadsheet = "MuHeQa_Validation"
-spreadsheetId = "1TY6Tj1OwITOW3o1nYRFFRY1bunvHNImUj-J0omRq4-I"
-validationSheet = "Validation"
+DEFAULT_NUMBER_OF_ANSWERS = int(os.getenv("DEFAULT_NUMBER_OF_ANSWERS"))
+MULTIPLE_ANSWERS_JSON = bool(os.getenv("MULTIPLE_ANSWERS"))
 
 def queryJSON(queryURL, question):
     """
@@ -40,7 +41,7 @@ def queryJSON(queryURL, question):
     if response:
         return response.json()
 
-def main():
+def app(db):
 
     @st.cache(show_spinner=False, allow_output_mutation=True)
     def getAnswers(question):
@@ -49,14 +50,17 @@ def main():
         """
         answerList = [
         ]
-
-        for i in knowledgeBases:
-            queryURL = QAService + i + "/en?evidence=true"
-            answer = queryJSON(queryURL,question)
-            #Si la respuesta es distinta de None, guardamos la fuente y agregamos la respuesta a la lista de contestaciones
-            if answer:
-                answer["source"] = i
-                answerList.append(answer)
+        if EQA_SERVICE_ROUTINGS:
+            for routing in EQA_SERVICE_ROUTINGS:
+                queryURL = EQA_SERVICE_DIRECTION + routing
+                answer = queryJSON(queryURL,question)
+                #Si la respuesta es distinta de None, guardamos la fuente y agregamos la respuesta a la lista de contestaciones
+                if answer:
+                    if MULTIPLE_ANSWERS_JSON:
+                        for uniqueAnswer in answer["answers"]:
+                            answerList.append(uniqueAnswer)
+                    answer["source"] = routing.partition("/")[0]
+                    answerList.append(answer)
 
         return answerList
     
@@ -77,8 +81,7 @@ def main():
         annotated_text(context[:answerStart],(answerInText,tag,color),context[answerEnd:],)
 
     #Creamos la conexion para la base de datos (datasets) y el Libro de Calculo (validacion)
-    spread = spreadManager.SpreadManager(spreadsheet, spreadsheetId, validationSheet)
-    db = dbManager.DbManager(dbDirection)
+    spread = spreadManager.SpreadManager(WORKSHEET, WORKSHEET_ID, SPREADSHEET)
 
     #Subtitulo de la seccion de pregunta y respuesta
     st.subheader('MuHeQa UI - Question Answering over Multiple and Heterogeneous Knowledge Bases')
@@ -111,7 +114,7 @@ def main():
     #Establecemos el titulo de la barra lateral
     st.sidebar.subheader('Options')
     #Control deslizante para el numero de respuestas a mostrar
-    answerNumber = st.sidebar.slider('How many relevant answers do you want?', 1, 10, 1)
+    answerNumber = st.sidebar.slider('How many relevant answers do you want?', 1, 10, DEFAULT_NUMBER_OF_ANSWERS)
     if question:
         st.write("**Question: **", question)
         if modelAnswer:
@@ -133,11 +136,12 @@ def main():
                 answer = response['answer']
                 if answer and answer != "-":
                     context = "..." + response["evidence"]["summary"] + "..."
-                    source = response["source"]
                     confidence = response["confidence"]
                     annotateContext(response, answer, context, response["evidence"]["start"], response["evidence"]["end"])
                     st.write("**Answer: **", answer)
+                    source = response["source"]
                     st.write('**Relevance:** ', confidence , '**Source:** ' , source)
+                    st.write('**Relevance:** ')
                     if idx == 0:
                         highestScoreAnswer = {
                             "answer": answer,
@@ -154,7 +158,7 @@ def main():
         #Si se pulsa el boton de correcto/incorrecto:
         if isRight or isWrong:
             #Insertamos en la Spreadsheet de Google
-            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz=timezone))]])
+            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz=SPREAD_TIMEZONE))]])
             #Reseteamos los valores de los botones
             isRight = False
             isWrong = False
