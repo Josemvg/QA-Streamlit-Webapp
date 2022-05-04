@@ -7,17 +7,7 @@ from utils import spreadManager
 from datetime import datetime
 from annotated_text import annotated_text
 
-"""
-Variables de entorno:
-- timezone: Huso horario cuyas horas vamos a usar en nuestra hoja
-- knowledgeBases: Lista de bases de conocimiento para nuestra consulta
-- QAService: Url del servicio de Question-Answering
-- dbDirection: Direccion de la base de datos
-- spreadsheet: Nombre del Libro de Calculo 
-- spreadsheet_id: Identificador de nuestro Libro de Calculo
-- validationSheet: Nombre de la Hoja a modificar (hoja de validacion)
-"""
-
+#Read environment variables
 EQA_SERVICE_DIRECTION = os.getenv("EQA_SERVICE_DIRECTION")
 EQA_SERVICE_ROUTINGS = os.getenv("EQA_SERVICE_ROUTINGS","").split(",")
 
@@ -31,7 +21,7 @@ MULTIPLE_ANSWERS_JSON = bool(os.getenv("MULTIPLE_ANSWERS"))
 
 def queryJSON(queryURL, question):
     """
-    Funcion auxiliar que realiza las preguntas al servidor de EQA
+    Auxiliary function to query the QA service
     """
     files = {
         'question': (None, question),
@@ -46,64 +36,74 @@ def app(db):
     @st.cache(show_spinner=False, allow_output_mutation=True)
     def getAnswers(question):
         """
-        Funcion auxiliar que obtiene una lista con todas las respuestas sobre las distintas bases de conocimiento
+        Auxiliary function that queries the QA service and returns the answers
         """
-        answerList = [
-        ]
+        answerList = []
+        #We iterate over the routings defined in the environment variable EQA_SERVICE_ROUTINGS if it is not empty
         if EQA_SERVICE_ROUTINGS:
             for routing in EQA_SERVICE_ROUTINGS:
                 queryURL = EQA_SERVICE_DIRECTION + routing
                 answer = queryJSON(queryURL,question)
-                #Si la respuesta es distinta de None, guardamos la fuente y agregamos la respuesta a la lista de contestaciones
+                #If the answer is not None, we add it to the answerList
                 if answer:
+                    #If there are multiple answers in the returned JSON, we iterate over them
                     if MULTIPLE_ANSWERS_JSON:
                         for uniqueAnswer in answer["answers"]:
                             answerList.append(uniqueAnswer)
-                    answer["source"] = routing.partition("/")[0]
+                    else:
+                        answerList.append(answer)
+        else:
+            queryURL = EQA_SERVICE_DIRECTION
+            answer = queryJSON(queryURL,question)
+            if answer:
+                if MULTIPLE_ANSWERS_JSON:
+                    for uniqueAnswer in answer["answers"]:
+                        answerList.append(uniqueAnswer)
+                else:
                     answerList.append(answer)
 
         return answerList
     
-    def annotateContext(response, answer, context, answerStart, answerEnd):
+    def annotateContext(answer, context, answerStart, answerEnd):
         '''
-        Funcion auxiliar que anota la respuesta sobre el texto de evidencia
+        Auxiliary function that annotates the context of the answer
         '''
-        tag = "ANSWER"
+        #Extract answer from context. Initialize tag as "ANSWER" and colour as green
+        answerInText = context[answerStart:answerEnd]
         color = "#adff2f"
-        #Buscamos la respuesta en el texto
-        answerInText = (response["evidence"]["summary"])[answerStart:answerEnd]
-        #Si la respuesta en el texto es distinta de la respuesta en el json:
+        tag = "ANSWER"
+        #If the answer is different from the one in the context, we annotate it in blue with "EVIDENCE" tag
         if answer != answerInText:
-            #Cambiamos la etiqueta a "EVIDENCE" y el color a a azul
             tag = "EVIDENCE"
             color = "#8ef"
-        #Marcamos en el texto de evidencia la respuesta y lo mostramos en la interfaz
+        #Annotate answer in context text
         annotated_text(context[:answerStart],(answerInText,tag,color),context[answerEnd:],)
 
-    #Creamos la conexion para la base de datos (datasets) y el Libro de Calculo (validacion)
+    #Create worksheet connection
     spread = spreadManager.SpreadManager(WORKSHEET, WORKSHEET_ID, SPREADSHEET)
 
-    #Subtitulo de la seccion de pregunta y respuesta
+    #Question-Answering module subtitle and description
     st.subheader('MuHeQa UI - Question Answering over Multiple and Heterogeneous Knowledge Bases')
     
-    #Texto del cuerpo de la pagina web con Markdown (convierte de texto a HTML)
     st.markdown("""
     Write any question below or use a random one from a pre-loaded datasets!
     """, unsafe_allow_html=True)
-
-    #Lista de Hojas de Calculo con Datasets en nuestra base de datos
-    selectorList = ["All"] 
-    selectorList.extend(db.getCollections())
     
-    #Buscador para realizar preguntas
+    #Search bar
     question = st.text_input("")
 
-    #Selector para el Dataset del que provendran las preguntas aleatorias
+    #Dataset Selector for random questions.
+    selectorList = ["All"] 
+    selectorList.extend(db.getCollections())  
     dataset = st.selectbox("Select a DataSet", selectorList)
-    #Boton que hace una pregunta aleatoria
+    
+    #Button to get a random question
     randomQuestion = st.button("Random Question")
     
-    #Inicializamos la variable modeLAnswer para que no sea referenciada antes de su asignacion
+    #Sidebar title and slider
+    st.sidebar.subheader('Options')
+    answerNumber = st.sidebar.slider('How many relevant answers do you want?', 1, 10, DEFAULT_NUMBER_OF_ANSWERS)
+    
     modelAnswer = None
 
     if randomQuestion:
@@ -111,23 +111,20 @@ def app(db):
         question = randomDict["question"]
         modelAnswer = randomDict["answer"]
 
-    #Establecemos el titulo de la barra lateral
-    st.sidebar.subheader('Options')
-    #Control deslizante para el numero de respuestas a mostrar
-    answerNumber = st.sidebar.slider('How many relevant answers do you want?', 1, 10, DEFAULT_NUMBER_OF_ANSWERS)
+    #If the question is not empty, we query the QA service
     if question:
         st.write("**Question: **", question)
+        #If there is a model answer, we show it
         if modelAnswer:
-            #Mostramos la respuesta modelo
             st.write("**Expected Answer: **", modelAnswer)
             st.write("\n")
-            #Reseteamos el valor de la respuesta modelo
             modelAnswer = None
-        #Mensaje de carga para las preguntas. Se muestra mientras que estas se obtienen.
+        #Spinner to show that the app is looking for answers
         with st.spinner(text=':hourglass: Looking for answers...'):
             counter = 0
             highestScoreAnswer = {}
             results = getAnswers(question)
+            #Sort the answers by score
             results.sort(key = operator.itemgetter('confidence'), reverse = True)
             for idx,response in enumerate(results):
                 if counter >= answerNumber:
@@ -142,30 +139,29 @@ def app(db):
                     source = response["source"]
                     st.write('**Relevance:** ', confidence , '**Source:** ' , source)
                     st.write('**Relevance:** ')
+                    #Save the answer with the highest score in a dictionary
                     if idx == 0:
                         highestScoreAnswer = {
                             "answer": answer,
                             "confidence": confidence
                         }
+        #Once answers are found, we display buttons to rate them
         st.write("Please rate if our answer has been helpful to you so we can further improve our system!")
-        #Botones para validar la respuesta por parte del usuario en columnas separadas          
         col1, col2 = st.columns([1,1])
         with col1:
             isRight = st.button("👍")
         with col2:
             isWrong = st.button("👎")
 
-        #Si se pulsa el boton de correcto/incorrecto:
+        #If the correct/incorrect button is pressed, we save the answer in the spreadsheet
         if isRight or isWrong:
-            #Insertamos en la Spreadsheet de Google
             spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz=SPREAD_TIMEZONE))]])
-            #Reseteamos los valores de los botones
+            #Reset buttons value and show a receipt message to the user
             isRight = False
             isWrong = False
-            #Mensaje de que el input del usuario ha sido registrado
             st.success("✨ Thanks for your input!")
 
-    #Checkbox. Si tenemos respuesta y la caja es marcada, imprimimos las respuestas JSON obtenidas.
+    #Sidebar Checkbox. If checked, we show the QA Service JSON response
     if question and st.sidebar.checkbox('Show JSON Response', key = 0):
         st.subheader('API JSON Response')
         st.write(results)

@@ -2,26 +2,23 @@ import streamlit as st
  
 class MultiPage: 
     """
-    Clase que gestiona multiples paginas en una misma aplicacion de streamlit.
+    Framework that combines multiple Streamlit applications in one single website.
     """
     def __init__(self) -> None:
         """
-        Constructor de la clase MultiPage
+        Class constructor
         """
-        #Atributo pages, diccionario con las subpaginas de nuestra interfaz
         self.pages = {}
     
-    def add_page(self, title, func) -> None: 
+    def addPage(self, title, func) -> None: 
         """
-        Metodo que agrega una pagina a nuestro proyecto. Argumentos:
-        - title: Titulo de la pagina, sera el que aparezca en el selector
-        - func: Funcion de Python que ejecutara nuestra interfaz para correr la pagina en cuestion
+        Function that adds a new page to the MultiPage (adds new entry to the pages dictionary)
         """
         self.pages.update({title: func})
 
     def run(self, db):
         """
-        Funcion que ejecuta el codigo de la aplicacion
+        Method that runs the MultiPage (executes the selected page).
         """
         #Selector   
         page = st.sidebar.radio(
@@ -29,5 +26,5 @@ class MultiPage:
             self.pages.keys()
         )
 
-        #Ejecutar funcion de la pagina seleccionada
+        #Run app of the selected page
         self.pages[page](db)

@@ -111,6 +111,7 @@ When using this User Interface for your Extractive Question-Answering Service, y
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ "
 }
 ```
+5. Give your newly created Service Account Editor permissions on your sheet.
 
 ### Deploying the web application
 1. Create a file with the following code, which can also be found in the `Dockerfile.streamlit` fie:
