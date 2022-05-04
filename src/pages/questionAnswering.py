@@ -11,7 +11,6 @@ from annotated_text import annotated_text
 EQA_SERVICE_DIRECTION = os.getenv("EQA_SERVICE_DIRECTION")
 EQA_SERVICE_ROUTINGS = os.getenv("EQA_SERVICE_ROUTINGS","").split(",")
 
-SPREAD_TIMEZONE = pytz.timezone(os.getenv("SPREAD_TIMEZONE","Europe/Madrid"))
 WORKSHEET = os.getenv("WORKSHEET")
 WORKSHEET_ID = os.getenv("WORKSHEET_ID")
 SPREADSHEET = os.getenv("SPREADSHEET")
@@ -155,7 +154,7 @@ def app(db):
 
         #If the correct/incorrect button is pressed, we save the answer in the spreadsheet
         if isRight or isWrong:
-            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz=SPREAD_TIMEZONE))]])
+            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz="Europe/Madrid"))]])
             #Reset buttons value and show a receipt message to the user
             isRight = False
             isWrong = False
