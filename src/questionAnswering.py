@@ -7,13 +7,14 @@ from utils import spreadManager
 from datetime import datetime
 from annotated_text import annotated_text
 
-#Read environment variables
-EQA_SERVICE_DIRECTION = os.getenv("EQA_SERVICE_DIRECTION")
+#Read environment variables and setup spreadsheet timezone
+EQA_SERVICE_URL = os.getenv("EQA_SERVICE_URL")
 EQA_SERVICE_ROUTINGS = os.getenv("EQA_SERVICE_ROUTINGS","").split(",")
 
 WORKSHEET = os.getenv("WORKSHEET")
 WORKSHEET_ID = os.getenv("WORKSHEET_ID")
 SPREADSHEET = os.getenv("SPREADSHEET")
+SPREAD_TIMEZONE = pytz.timezone("Europe/Madrid")
 
 DEFAULT_NUMBER_OF_ANSWERS = int(os.getenv("DEFAULT_NUMBER_OF_ANSWERS"))
 MULTIPLE_ANSWERS_JSON = bool(os.getenv("MULTIPLE_ANSWERS"))
@@ -41,18 +42,18 @@ def app(db):
         #We iterate over the routings defined in the environment variable EQA_SERVICE_ROUTINGS if it is not empty
         if EQA_SERVICE_ROUTINGS:
             for routing in EQA_SERVICE_ROUTINGS:
-                queryURL = EQA_SERVICE_DIRECTION + routing
+                queryURL = EQA_SERVICE_URL + routing
                 answer = queryJSON(queryURL,question)
                 #If the answer is not None, we add it to the answerList
                 if answer:
                     #If there are multiple answers in the returned JSON, we iterate over them
-                    if MULTIPLE_ANSWERS_JSON:
+                    if MULTIPLE_ANSWERS_JSON == "True":
                         for uniqueAnswer in answer["answers"]:
                             answerList.append(uniqueAnswer)
                     else:
                         answerList.append(answer)
         else:
-            queryURL = EQA_SERVICE_DIRECTION
+            queryURL = EQA_SERVICE_URL
             answer = queryJSON(queryURL,question)
             if answer:
                 if MULTIPLE_ANSWERS_JSON:
@@ -93,15 +94,18 @@ def app(db):
 
     #Dataset Selector for random questions.
     selectorList = ["All"] 
-    selectorList.extend(db.getCollections())  
-    dataset = st.selectbox("Select a DataSet", selectorList)
+    selectorList.extend(db.getCollections())
+    if selectorList == ["All"]:
+        st.markdown("No datasets available")
+    else: 
+        dataset = st.selectbox("Select a DataSet", selectorList)  
     
     #Button to get a random question
-    randomQuestion = st.button("Random Question")
+    randomQuestion = st.button("Make a Random Question")
     
     #Sidebar title and slider
-    st.sidebar.subheader('Options')
-    answerNumber = st.sidebar.slider('How many relevant answers do you want?', 1, 10, DEFAULT_NUMBER_OF_ANSWERS)
+    st.sidebar.subheader("Options")
+    answerNumber = st.sidebar.slider("How many relevant answers do you want?", 1, 10, DEFAULT_NUMBER_OF_ANSWERS)
     
     modelAnswer = None
 
@@ -133,11 +137,10 @@ def app(db):
                 if answer and answer != "-":
                     context = "..." + response["evidence"]["summary"] + "..."
                     confidence = response["confidence"]
-                    annotateContext(response, answer, context, response["evidence"]["start"], response["evidence"]["end"])
+                    annotateContext(answer, context, response["evidence"]["start"] + 3, response["evidence"]["end"] + 3)
                     st.write("**Answer: **", answer)
                     source = response["source"]
                     st.write('**Relevance:** ', confidence , '**Source:** ' , source)
-                    st.write('**Relevance:** ')
                     #Save the answer with the highest score in a dictionary
                     if idx == 0:
                         highestScoreAnswer = {
@@ -154,7 +157,7 @@ def app(db):
 
         #If the correct/incorrect button is pressed, we save the answer in the spreadsheet
         if isRight or isWrong:
-            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz="Europe/Madrid"))]])
+            spread.insertRow([[question, highestScoreAnswer["answer"], str(highestScoreAnswer["confidence"]), isRight, str(datetime.now(tz=SPREAD_TIMEZONE))]])
             #Reset buttons value and show a receipt message to the user
             isRight = False
             isWrong = False

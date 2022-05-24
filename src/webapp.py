@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.multipage import MultiPage
 from utils import dbManager 
-from pages import questionAnswering, datasetManagement, reportGeneration
+import questionAnswering, datasetManagement, reportGeneration
 
 #Set Page attributes
 st.set_page_config(
