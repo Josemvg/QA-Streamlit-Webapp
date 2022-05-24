@@ -2,10 +2,6 @@ import os
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
-#Change work directory to current file location
-fileDir = os.path.dirname(os.path.realpath(__file__))
-os.chdir(fileDir)
-
 class SpreadManager:
 
     def __init__(self,spreadsheet, spreadsheetId, validationSheet):
