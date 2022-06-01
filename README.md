@@ -5,7 +5,7 @@
 
 ## Basic Overview
 Web Interface based on Streamlit for a QA service working as a REST API. This User Interface was developed for the Extractive Question-Answering Service [MuHeQa](https://github.com/librairy/MuHeQA) as part of my End of Degree Project (Trabajo de Fin de Grado) for my Bachelor's Degree in Mathematics and Computer Science.  
-For a detailed guide on implementation, usage and more please refer to [this Document](https://www.overleaf.com/read/ggqhsgrcjhgf) (in Spanish), which can also be found under the docs folder.
+For a detailed guide on implementation, usage and more please refer to [this Document](https://www.overleaf.com/read/ggqhsgrcjhgf) (in Spanish), which can also be found under the docs folder as `TFG_JOSE_MANUEL_VEGA_GRADIT`.
 
 ## JSON Responses
 When using this User Interface for your Extractive Question-Answering Service, you need to bear in mind that the Question Answering Module on our webapp is able to read answers from JSON Responses with the following formats. 
@@ -87,7 +87,7 @@ When using this User Interface for your Extractive Question-Answering Service, y
     2. Create a new project from the Navigation Bar by clicking "My First Project", and then "New Project" on the pop-up window:
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20First%20Project.png"></p>
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20New%20Project.png"></p>
-    3. Next, we must active the [IAM API](https://console.cloud.google.com/flows/enableapi?apiid=iam.googleapis.com). We select our newly created Project, click Next and Enable.
+    3. Next, we must active the [IAM API](https://console.cloud.google.com/flows/enableapi?apiid=iam.googleapis.com/). We select our newly created Project, click Next and Enable.
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20IAM.png"></p>
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20IAM2.png"></p>
     4. Next, from "Enabled APIs and Services" (Sidebar) click on "+ Enable APIs and Services".
