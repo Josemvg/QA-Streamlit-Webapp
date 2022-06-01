@@ -7,8 +7,7 @@ from fpdf import FPDF, HTMLMixin
 from utils import questionClassifier
 from tempfile import NamedTemporaryFile
 
-resourcesDir = os.path.join(os.path.dirname(os.path.realpath("__file__")),"resources_dir")
-
+resourcesDir = "./utils/resources_dir"
 classifier = questionClassifier.QuestionClassifier(resourcesDir)
 
 class MyFPDF(FPDF, HTMLMixin):
@@ -118,6 +117,8 @@ def generateDataframe(db, datasetName):
     return df
 
 def app(db):    
+
+    st.subheader('Dataset Report Generation')
 
     st.markdown("""
     Select a dataset to generate a quality report on it.

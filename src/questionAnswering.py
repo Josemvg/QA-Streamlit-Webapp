@@ -17,7 +17,7 @@ SPREADSHEET = os.getenv("SPREADSHEET")
 SPREAD_TIMEZONE = pytz.timezone("Europe/Madrid")
 
 DEFAULT_NUMBER_OF_ANSWERS = int(os.getenv("DEFAULT_NUMBER_OF_ANSWERS"))
-MULTIPLE_ANSWERS_JSON = bool(os.getenv("MULTIPLE_ANSWERS"))
+MULTIPLE_ANSWERS_JSON = os.getenv("MULTIPLE_ANSWERS")
 
 def queryJSON(queryURL, question):
     """
@@ -83,7 +83,7 @@ def app(db):
     spread = spreadManager.SpreadManager(WORKSHEET, WORKSHEET_ID, SPREADSHEET)
 
     #Question-Answering module subtitle and description
-    st.subheader('MuHeQa UI - Question Answering over Multiple and Heterogeneous Knowledge Bases')
+    st.subheader('Question-Answering')
     
     st.markdown("""
     Write any question below or use a random one from a pre-loaded datasets!

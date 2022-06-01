@@ -2,6 +2,9 @@ import os
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
+#Path to the credentials file
+credentialsPath = './utils/credentials.json'
+
 class SpreadManager:
 
     def __init__(self,spreadsheet, spreadsheetId, validationSheet):
@@ -13,8 +16,8 @@ class SpreadManager:
         self.spreadsheetId = spreadsheetId
         self.validationSheet = validationSheet
         
-        if os.path.exists('credentials.json'):
-            self.creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', self.scope)
+        if os.path.exists(credentialsPath):
+            self.creds = ServiceAccountCredentials.from_json_keyfile_name(credentialsPath, self.scope)
             self.service = build("sheets","v4",credentials=self.creds, cache_discovery=False)
             self.connector = self.service.spreadsheets()
         else:
