@@ -87,7 +87,9 @@ When using this User Interface for your Extractive Question-Answering Service, y
     2. Create a new project from the Navigation Bar by clicking "My First Project", and then "New Project" on the pop-up window:
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20First%20Project.png"></p>
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20New%20Project.png"></p>
-    3. Next, we must active the [Identity Access and Management API](https://console.cloud.google.com/flows/enableapi?apiid=iam.googleapis.com/). We select our newly created Project, click Next and Enable.
+    3. Next, we must active the [IAM API](https://console.cloud.google.com/flows/enableapi?apiid=iam.googleapis.com). We select our newly created Project, click Next and Enable.
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20IAM.png"></p>
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20IAM2.png"></p>
     4. Next, from "Enabled APIs and Services" (Sidebar) click on "+ Enable APIs and Services".
     <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20APIs.png"></p>
     5. From the search bar, look for "Google Drive API" and "Google Sheets API" and enable them so you can access Sheets uploaded on Google Drive.
@@ -96,6 +98,8 @@ When using this User Interface for your Extractive Question-Answering Service, y
     6. Go to "Credentials" (sidebar), click "Create Credentials" -> "Service Account Key". Create a new account.
     <p align="center"><img src=https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Create%20Credentials.png></p> 
     7. From the "Credentials" page, access your newly created account at the "Service Accounts" Section by clicking on it. Finally, on "Keys" add a new key from the "Add Keys" button, with Type "JSON".
+    <p align="center"><img src=https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Create%20Key.png></p>
+    
 4. A JSON with the following format should have been downloaded onto your PC. Save it on `src/utils/` as `credentials.json`.
 ```
 {
