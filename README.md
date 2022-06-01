@@ -2,11 +2,10 @@
 ![Docker](https://img.shields.io/badge/docker-v20.10.2+-blue.svg)
 ![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)
 ![Task](https://img.shields.io/badge/task-EQAKG-green.svg)
-[![License](https://img.shields.io/badge/license-MIT-red)](https://choosealicense.com/licenses/mit/)
 
 ## Basic Overview
 Web Interface based on Streamlit for a QA service working as a REST API. This User Interface was developed for the Extractive Question-Answering Service [MuHeQa](https://github.com/librairy/MuHeQA) as part of my End of Degree Project (Trabajo de Fin de Grado) for my Bachelor's Degree in Mathematics and Computer Science.  
-For a detailed guide on implementation, usage and more please refer to [this Document](https://www.overleaf.com/read/ggqhsgrcjhgf) (in Spanish).
+For a detailed guide on implementation, usage and more please refer to [this Document](https://www.overleaf.com/read/ggqhsgrcjhgf) (in Spanish), which can also be found under the docs folder.
 
 ## JSON Responses
 When using this User Interface for your Extractive Question-Answering Service, you need to bear in mind that the Question Answering Module on our webapp is able to read answers from JSON Responses with the following formats. 
@@ -86,16 +85,17 @@ When using this User Interface for your Extractive Question-Answering Service, y
 3. Next, you will need to create a Service Account and obtain OAuth2 Credentials to access your Spreadsheet from the Google Drive API for Python.
     1. Head over to the [Google API Dashboard](https://console.developers.google.com/).
     2. Create a new project from the Navigation Bar by clicking "My First Project", and then "New Project" on the pop-up window:
-    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20First%20Project.png"></p>
-    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20New%20Project.png"></p>
-    3. Next, from "Enabled APIs and Services" (Sidebar) click on "+ Enable APIs and Services".
-    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20APIs.png"></p>
-    4. From the search bar, look for "Google Drive API" and "Google Sheets API" and enable them so you can access Sheets uploaded on Google Drive.
-    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Drive.png"></p>
-    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Sheets.png"></p>
-    5. Go to "Credentials" (sidebar), click "Create Credentials" -> "Service Account Key". Create a new account.
-    <p align="center"><img src=https://raw.githubusercontent.com/Josemvg/QA-Streamlit-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Create%20Credentials.png></p> 
-    6. From the "Credentials" page, access your newly created account at the "Service Accounts" Section. Finally, on "Keys" add a new key from the "Add Keys" button, with Type "JSON".
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20First%20Project.png"></p>
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20New%20Project.png"></p>
+    3. Next, we must active the [Identity Access and Management API](https://console.cloud.google.com/flows/enableapi?apiid=iam.googleapis.com/). We select our newly created Project, click Next and Enable.
+    4. Next, from "Enabled APIs and Services" (Sidebar) click on "+ Enable APIs and Services".
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Enable%20APIs.png"></p>
+    5. From the search bar, look for "Google Drive API" and "Google Sheets API" and enable them so you can access Sheets uploaded on Google Drive.
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Drive.png"></p>
+    <p align="center"><img src="https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Sheets.png"></p>
+    6. Go to "Credentials" (sidebar), click "Create Credentials" -> "Service Account Key". Create a new account.
+    <p align="center"><img src=https://raw.githubusercontent.com/Josemvg/QA-Webapp/master/docs/imgs/Google%20API%20Credentials%20-%20Create%20Credentials.png></p> 
+    7. From the "Credentials" page, access your newly created account at the "Service Accounts" Section by clicking on it. Finally, on "Keys" add a new key from the "Add Keys" button, with Type "JSON".
 4. A JSON with the following format should have been downloaded onto your PC. Save it on `src/utils/` as `credentials.json`.
 ```
 {
